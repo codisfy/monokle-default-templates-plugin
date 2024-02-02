@@ -1,2 +1,4 @@
 apiVersion: v1-alpha
 kind: Allocate
+metadata:
+  name: [[forms[0].name]]
