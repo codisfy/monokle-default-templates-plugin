@@ -1,38 +1,538 @@
 {
-  "type": "object",
-  "required": ["name", "labels", "serviceName"],
-  "properties": {
-    "name": {
+
+  "$defs": {
+    "AllocationConfigMetadataModel": {
+      "properties": {
+        "rule_name": {
+          "title": "Rule name",
+          "type": "string"
+        },
+        "rule_version": {
+          "title": "Rule version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "rule_name",
+        "rule_version"
+      ],
+      "title": "",
+      "type": "object"
+    },
+    "ColumnValueSelectorModel": {
+      "additionalProperties": false,
+      "properties": {
+        "column_name": {
+          "title": "Column name",
+          "type": "string"
+        },
+        "match": {
+          "type": "string",
+          "title": "Match Value"
+        },
+        "operator": {
+          "enum": [
+            "=",
+            "!=",
+            ">",
+            "<",
+            ">=",
+            "<="
+          ],
+          "title": "Operator",
+          "type": "string"
+        }
+      },
+      "required": [
+        "column_name",
+        "operator",
+        "match"
+      ],
+      "title": "Column Value Selector",
+      "type": "object"
+    },
+    "Exclude": {
+      "$id": "ExcludeColumnsAllocate",
+      "title": "Exclude",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "InlineFixedDistribution": {
+      "properties": {
+        "additional_filters": {
+          "default": null,
+          "items": {
+            "title": "Additional filters",
+            "anyOf": [
+              {
+                "$ref": "#/$defs/SQLConditionClauseModel"
+              },
+              {
+                "$ref": "#/$defs/ColumnValuesObject"
+              }
+            ]
+          },
+          "title": "Additional filters",
+          "type": "array"
+        },
+        "strategy": {
+          "const": "fixed_proportion_inline",
+          "default": "fixed_proportion_inline",
+          "title": "Strategy"
+        },
+        "ratio": {
+          "title": "Allocation ratio",
+          "type": "string"
+        },
+        "rows": {
+          "$ref": "#/$defs/InlineFixedDistributionDestinationRowGroup",
+          "title": "Distribution Dataset"
+        },
+        "exclude": {
+          "$ref": "#/$defs/Exclude"
+        }
+      },
+      "required": [
+        "ratio",
+        "rows"
+      ],
+      "title": "Inline Fixed Distribution",
+      "type": "object"
+    },
+    "InlineFixedDistributionDestinationRowGroup": {
+      "properties": {
+        "header": {
+          "title": "Headers",
+          "type": "string"
+        },
+        "values": {
+          "$id": "RowValues",
+          "items": {
+            "type": "string"
+          },
+          "title": "Row values",
+          "type": "array"
+        }
+      },
+      "required": [
+        "header",
+        "values"
+      ],
+      "title": "InlineFixedDistributionDestinationRowGroup",
+      "type": "object"
+    },
+    "NWayDistributionDynamic": {
+      "additionalProperties": false,
+      "properties": {
+        "additional_filters": {
+          "default": null,
+          "items": {
+            "title": "Additional filter",
+            "anyOf": [
+              {
+                "$ref": "#/$defs/SQLConditionClauseModel"
+              },
+              {
+                "$ref": "#/$defs/ColumnValuesObject"
+              }
+            ]
+          },
+          "title": "Additional filters",
+          "type": "array"
+        },
+        "strategy": {
+          "const": "n_way_dynamic",
+          "default": "n_way_dynamic",
+          "title": "Strategy"
+        },
+        "distribution_by": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NwayDistributionGroupByInput"
+            },
+            {
+              "$ref": "#/$defs/NwayDistributionSQLInput"
+            }
+          ],
+          "title": "Distribution by"
+        },
+        "reference_data_source": {
+          "default": null,
+          "title": "Reference data source path",
+          "type": "string"
+        }
+      },
+      "required": [
+        "distribution_by"
+      ],
+      "title": "N-Way Dynamic",
+      "type": "object"
+    },
+    "NWayDistributionStaticInline": {
+      "additionalProperties": false,
+      "title": "N-Way Static Inline",
+      "properties": {
+        "additional_filters": {
+          "default": null,
+          "items": {
+            "title": "Additional filter",
+            "anyOf": [
+              {
+                "$ref": "#/$defs/SQLConditionClauseModel"
+              },
+              {
+                "$ref": "#/$defs/ColumnValuesObject"
+              }
+            ]
+          },
+          "title": "Additional filter",
+          "type": "array"
+        },
+        "strategy": {
+          "const": "n_way_static_inline",
+          "default": "n_way_static_inline",
+          "title": "Strategy"
+        },
+        "rows": {
+          "$ref": "#/$defs/InlineFixedDistributionDestinationRowGroup",
+          "title": "Distribution Dataset"
+        },
+        "exclude": {
+          "$ref": "#/$defs/Exclude"
+        }
+      },
+      "required": [
+        "rows"
+      ],
+      "type": "object"
+    },
+    "NWayDistributionStaticReferenced": {
+      "additionalProperties": false,
+      "properties": {
+        "additional_filters": {
+          "default": null,
+          "items": {
+            "title": "Additional filter",
+            "anyOf": [
+              {
+                "$ref": "#/$defs/SQLConditionClauseModel"
+              },
+              {
+                "$ref": "#/$defs/ColumnValuesObject"
+              }
+            ]
+          },
+          "title": "Additional filters",
+          "type": "array"
+        },
+        "strategy": {
+          "const": "n_way_static_referenced",
+          "default": "n_way_static_referenced",
+          "title": "Strategy"
+        },
+        "reference_data_source": {
+          "title": "Reference data source path",
+          "type": "string"
+        }
+      },
+      "required": [
+        "reference_data_source"
+      ],
+      "title": "N-Way Static Referenced",
+      "type": "object"
+    },
+    "NwayDistributionGroupByInput": {
+      "items": {
+        "type": "string"
+      },
+      "$id": "NwayDistributionGroupByInput",
+      "title": "N-Way Distribution Group By Input",
+      "type": "array"
+    },
+    "NwayDistributionSQLInput": {
+      "title": "N-Way Distribution SQL",
       "type": "string"
     },
-    "namespace": {
-      "type": "string",
-      "default": "default"
+    "OverrideStaticValueConfigModel": {
+      "properties": {
+        "column_name": {
+          "title": "Column name",
+          "type": "string"
+        },
+        "static_value": {
+          "title": "Static value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "column_name",
+        "static_value"
+      ],
+      "title": "Override Static Value",
+      "type": "object"
     },
-    "image": {
-      "type": "string",
-      "default": ""
+    "ScopeInputModel": {
+      "properties": {
+        "input": {
+          "default": "include",
+          "enum": [
+            "include",
+            "exclude"
+          ],
+          "title": "Input type",
+          "type": "string"
+        },
+        "providers": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ScopeInputProvidersModel"
+          },
+          "title": "Providers",
+          "type": "array"
+        }
+      },
+      "title": "Scope Input",
+      "type": "object"
     },
-    "labels": {
-      "type": "string",
-      "default": "ss: redis"
+    "ScopeInputProvidersModel": {
+      "properties": {
+        "provider": {
+          "type": "string",
+          "title": "Provider"
+        },
+        "billing_account_ids": {
+          "default": "",
+          "title": "Billing Account IDs",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "provider"
+      ],
+      "title": "Providers",
+      "type": "object"
     },
-    "serviceName": {
+    "ProportionateDistribution": {
+      "properties": {
+        "additional_filters": {
+          "default": null,
+          "items": {
+            "title": "Additional filter",
+            "anyOf": [
+              {
+                "$ref": "#/$defs/SQLConditionClauseModel"
+              },
+              {
+                "$ref": "#/$defs/ColumnValuesObject"
+              }
+            ]
+          },
+          "title": "Additional filters",
+          "type": "array"
+        },
+        "strategy": {
+          "const": "proportionate",
+          "default": "proportionate",
+          "title": "Strategy"
+        },
+        "reference_data_source": {
+          "title": "Reference data source path",
+          "type": "string"
+        },
+        "metric_column": {
+          "default": "EffectiveCost",
+          "enum": [
+            "EffectiveCost",
+            "BilledCost",
+            "ListCost",
+            "ActiveUsers"
+          ],
+          "title": "Cost metric column",
+          "type": "string"
+        },
+        "exclude": {
+          "$ref": "#/$defs/Exclude"
+        }
+      },
+      "required": [
+        "select_columns"
+      ],
+      "title": "Proportionate",
+      "type": "object"
+    },
+    "ColumnValuesObject": {
+      "type": "object",
+      "title": "Column Value Selector",
+      "properties": {
+        "value": {
+          "type": "string",
+          "title": "Value"
+        },
+        "condition": {
+          "$ref": "#/$defs/ColumnValueSelectorModel"
+        }
+      }
+    },
+    "ReferencedFixedDistribution": {
+      "properties": {
+        "additional_filters": {
+          "default": null,
+          "items": {
+            "title": "Additional filter",
+            "anyOf": [
+              {
+                "$ref": "#/$defs/SQLConditionClauseModel"
+              },
+              {
+                "$ref": "#/$defs/ColumnValuesObject"
+              }
+            ]
+          },
+          "title": "Additional filters",
+          "type": "array"
+        },
+        "strategy": {
+          "const": "fixed_proportion_referenced",
+          "default": "fixed_proportion_referenced",
+          "title": "Strategy"
+        },
+        "reference_data_source": {
+          "title": "Reference data source path",
+          "type": "string"
+        }
+      },
+      "required": [
+        "reference_data_source"
+      ],
+      "title": "Referenced Fixed Distribution",
+      "type": "object"
+    },
+    "SQLConditionClauseModel": {
+      "title": "SQL Condition Clause",
       "type": "string"
     },
-    "replicas": {
-      "type": "number",
-      "default": 2
-    },
-    "accessMode": {
-      "type": "string",
-      "default": "ReadWriteOnce",
-      "enum": [
-        "ReadWriteOnce",
-        "ReadOnlyMany",
-        "ReadWriteMany",
-        "ReadWriteOncePod"
-      ]
+    "SourceCostSelectionSpecificationModel": {
+      "additionalProperties": false,
+      "properties": {
+        "filters": {
+          "items": {
+            "title": "Filter",
+            "anyOf": [
+              {
+                "$ref": "#/$defs/SQLConditionClauseModel"
+              },
+              {
+                "$ref": "#/$defs/ColumnValuesObject"
+              }
+            ]
+          },
+          "title": "Filters",
+          "type": "array"
+        }
+      },
+      "required": [
+        "filters"
+      ],
+      "title": "SourceCostSelectionSpecificationModel",
+      "type": "object"
     }
-  }
+  },
+  "properties": {
+    "config_type": {
+      "default": "AllocateConfig",
+      "enum": [
+        "ExtractConfig",
+        "EnhanceConfig",
+        "NormalizeConfig",
+        "AllocateConfig",
+        "ExportConfig",
+        "AllocateDistributionConfig",
+        "AllocateCostSourceSelectionConfig"
+      ],
+      "title": "Config type",
+      "type": "string"
+    },
+    "api_version": {
+      "default": "v1-alpha",
+      "title": "API Version",
+      "type": "string"
+    },
+    "metadata": {
+      "$ref": "#/$defs/AllocationConfigMetadataModel"
+    },
+    "spec": {
+      "additionalProperties": false,
+      "properties": {
+        "scope": {
+          "items": {
+            "$ref": "#/$defs/ScopeInputModel"
+          },
+          "title": "Rule scope",
+          "type": "array"
+        },
+        "granularity": {
+          "enum": [
+            "daily",
+            "monthly"
+          ],
+          "title": "Cost data granularity",
+          "type": "string"
+        },
+        "source_cost_selection": {
+          "$ref": "#/$defs/SourceCostSelectionSpecificationModel",
+          "title": "Cost data source selection"
+        },
+        "distribution_table": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/NWayDistributionStaticInline"
+            },
+            {
+              "$ref": "#/$defs/NWayDistributionStaticReferenced"
+            },
+            {
+              "$ref": "#/$defs/NWayDistributionDynamic"
+            },
+            {
+              "$ref": "#/$defs/ProportionateDistribution"
+            },
+            {
+              "$ref": "#/$defs/ReferencedFixedDistribution"
+            },
+            {
+              "$ref": "#/$defs/InlineFixedDistribution"
+            }
+          ],
+          "title": "Distribution table"
+        },
+        "overrides": {
+          "default": null,
+          "items": {
+            "$ref": "#/$defs/OverrideStaticValueConfigModel"
+          },
+          "title": "Overrides",
+          "type": "array"
+        }
+      },
+      "required": [
+        "scope",
+        "granularity",
+        "source_cost_selection",
+        "distribution_table"
+      ],
+      "type": "object",
+      "title": ""
+    }
+  },
+  "required": [
+    "metadata",
+    "spec"
+  ],
+  "type": "object"
+
 }

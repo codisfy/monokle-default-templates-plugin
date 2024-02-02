@@ -1,58 +1,18 @@
 {
-  "name": "Monokle Default Templates Plugin",
-  "author": "kubeshop.io",
+  "name": "Codisfy Default Templates Plugin",
+  "author": "codisfy",
   "version": "1.1.0",
-  "description": "This plugin provides the default resource templates for Monokle",
+  "description": "This plugin provides custom templats",
   "license": "MIT",
-  "repository": "https://github.com/kubeshop/monokle-default-templates-plugin",
+  "repository": "https://github.com/codisfy/monokle-default-templates-plugin",
   "monoklePlugin": {
-    "id": "io.kubeshop.monokle.plugins.default-templates",
-    "helpUrl": "https://github.com/kubeshop/monokle-default-templates-plugin",
+    "id": "io.codisfy.monokle.plugins.default-templates",
+    "helpUrl": "https://github.com/codisfy/monokle-default-templates-plugin",
     "icon": "default_template.svg",
     "modules": [
       {
         "type": "template",
-        "path": "deployment-template"
-      },
-      {
-        "type": "template",
-        "path": "basic-job-template"
-      },
-      {
-        "type": "template",
-        "path": "basic-pod-template"
-      },
-      {
-        "type": "template",
-        "path": "advanced-pod-template"
-      },
-      {
-        "type": "template",
-        "path": "basic-role-template"
-      },
-      {
-        "type": "template",
-        "path": "rolebinding-serviceaccount-template"
-      },
-      {
-        "type": "template",
-        "path": "role-rolebinding-serviceaccount-template"
-      },
-      {
-        "type": "template",
-        "path": "basic-service-template"
-      },
-      {
-        "type": "template",
-        "path": "persistent-vol-claim-template"
-      },
-      {
-        "type": "template",
-        "path": "persistent-vol-template"
-      },
-      {
-        "type": "template",
-        "path": "statefulset-template"
+        "path": "allocate-template"
       }
     ]
   }
